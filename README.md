@@ -269,7 +269,7 @@ client-onboarding-orchestrator/
 - Direct control over Claude model selection (Haiku vs Sonnet)
 - Structured tool use with forced `tool_choice`
 - Clean abstraction for multi-agent workflows
-- Evaluator can easily review agent decisions
+- Easy to understand and review agent decisions
 
 ### Why Sequential Chain (Not Parallel)?
 - **Audit clarity**: Clear ordering in logs
@@ -346,13 +346,14 @@ See [DEVELOPMENT_NOTES.md](DEVELOPMENT_NOTES.md) for:
 
 ## Submission
 
-This project is designed for the CCA-F (Claude Architect Foundation) capstone evaluation.
+This project implements a multi-agent wealth management client onboarding system.
 
-**Grading Rubric Alignment:**
-- **Architecture (22-25)** — Mermaid diagram, decomposition pattern, justification
-- **Tech Stack (22-25)** — Model tiers, tool schemas (5-rule), structured output, error categories
-- **Claude Cowork (22-25)** — Integration documentation (see COWORK_USAGE.md)
-- **Claude Code (22-25)** — CLAUDE.md + commands + skills + hooks + development evidence
+**Repository Contents:**
+- Complete implementation with all source code
+- Comprehensive documentation (ARCHITECTURE.md, CLAUDE.md, etc.)
+- Sample execution outputs demonstrating all scenarios
+- Claude Code integration (commands, skills, hooks)
+- Tool schemas and system configuration
 
 ---
 

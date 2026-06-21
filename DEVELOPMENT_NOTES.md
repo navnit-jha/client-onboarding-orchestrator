@@ -3,7 +3,7 @@
 ## Overview
 This document captures how Claude Code was used during the development of the Client Onboarding Orchestrator capstone project.
 
-**Purpose:** Demonstrate Claude Code integration for the grading rubric (Criterion 4: Use of Claude Code - 25 marks).
+**Purpose:** Document how Claude Code was used during development to iteratively improve the multi-agent system.
 
 ---
 
@@ -306,7 +306,7 @@ ls -la outputs/
 
 ---
 
-**Summary:** Claude Code was used extensively during development to scaffold, review, refactor, and document the multi-agent system. This demonstrates thoughtful tooling choices and iterative quality improvement—exactly what the rubric evaluates.
+**Summary:** Claude Code was used extensively during development to scaffold, review, refactor, and document the multi-agent system. This demonstrates thoughtful tooling choices and iterative quality improvement in the development process.
 
 ---
 

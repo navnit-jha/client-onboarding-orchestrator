@@ -181,26 +181,28 @@ Send daily summary to compliance manager's inbox.
 > 3. Evaluation is on agent design + Claude Code usage, not infrastructure
 > 4. Time better spent perfecting agent logic than setting up connectors"
 
-This is a defensible choice and still scores in the **Strong/Distinction band** on the Cowork criterion if documented.
+This is a valid choice for a project focused on multi-agent orchestration.
 
 ---
 
-## Recommended for Capstone Submission
+## Optional: Implementing Cowork Integration
 
-If you want to maximize Cowork credit:
+If you choose to integrate Cowork features:
 
-### Minimum (Strong band):
-1. **XLSX Report**: Screenshot showing Excel report generated for 1 client summary
-   - Save screenshot to: `screenshots/cowork_xlsx_report.png`
+### XLSX Report Generation:
+1. **Create Excel report** showing onboarding summary
+   - Clients processed, approval rates, risk distribution
+   - Save to: `outputs/cowork_report.xlsx`
 
-2. **Documentation**: Write this all up in COWORK_USAGE.md
-   - Explain which Cowork skills/connectors were considered
-   - Screenshot or transcript showing invocation
+### Scheduled Tasks:
+1. **Set up overnight compliance recheck** task
+   - Schedule: Daily at 11 PM
+   - Action: Re-verify all existing clients
 
-### Stretch (Distinction band):
-1. **XLSX + Slack + Scheduled Task**: All 3 above
-2. **Transcripts**: Screenshot/transcript showing actual Cowork usage
-3. **Rationale**: Clear defense of choices (why these 3, why not others?)
+### Slack Notifications:
+1. **Configure Slack alerts** for manual review cases
+   - Channel: `#compliance-alerts`
+   - Trigger: When Critic escalates inconsistency
 
 ---
 
@@ -247,28 +249,12 @@ Document in this file with inline examples and expected outputs.
 
 ---
 
-## Grading Context
-
-**Rubric (Criterion 3: Use of Claude Cowork - 25 marks):**
-
-**Distinction (22-25):**
-- "Cowork used deliberately for the parts where it shines (file outputs, scheduled jobs, connectors)"
-- "Transcripts or screenshots show real usage"
-- "OR Cowork deliberately NOT used with a clear, defended explanation"
-
-This capstone qualifies for Distinction under either path:
-1. **Path A**: Screenshot XLSX report + scheduled task proof + Slack
-2. **Path B**: Document why Cowork wasn't needed for this scope (valid for agentic AI capstone)
-
----
-
 ## Next Steps
 
-1. **Decision**: Will you use Cowork for this capstone? (Yes/No)
-2. **If Yes**: Set up 1-2 integrations (XLSX + Slack recommended)
-3. **If No**: Write 1-2 sentence defense in COWORK_USAGE.md (Distinct band-eligible)
-4. **Screenshot**: Capture evidence (screenshot or transcript)
-5. **Document**: Link screenshots here or in README
+1. **Decide** whether to implement Cowork integrations
+2. **If implementing**: Set up XLSX reports, scheduled tasks, or Slack notifications
+3. **If not implementing**: Current setup is focused on core multi-agent functionality
+4. **Document**: Any implementation details in this file
 
 ---
 
