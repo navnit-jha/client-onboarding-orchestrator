@@ -12,17 +12,14 @@ Why Critic Agent?
 import json
 import time
 from typing import Dict, Any
-from openai import OpenAI
-from tools.schemas import TOOL_SCHEMAS
+from anthropic import Anthropic
+from tools.schemas import get_all_tools
 
-client = OpenAI()
+client = Anthropic()
 
 SONNET_MODEL = "claude-3-5-sonnet-20241022"
 
-CRITIC_TOOLS = [
-    TOOL_SCHEMAS["validate_approval_chain"],
-    TOOL_SCHEMAS["detect_inconsistencies"],
-]
+# Tools loaded dynamically in run_critic_agent
 
 CRITIC_SYSTEM_PROMPT = """You are a CRITIC AGENT - Final approval validator for wealth management onboarding.
 Your role: Meta-validate entire approval chain, catch hallucinations, implement 4-eyes principle.
@@ -83,10 +80,14 @@ Strict rule: If compliance_risk == "BLOCKED", reject immediately (non-recoverabl
 """
 
     try:
-        response = client.beta.messages.create(
+        # Get critic tools
+        all_tools = get_all_tools()
+        critic_tools = [t for t in all_tools if t['function']['name'] in ['validate_approval_chain', 'detect_inconsistencies']]
+
+        response = client.messages.create(
             model=SONNET_MODEL,
             max_tokens=1500,
-            tools=CRITIC_TOOLS,
+            tools=critic_tools,
             system=CRITIC_SYSTEM_PROMPT,
             messages=[
                 {"role": "user", "content": user_message}
@@ -105,12 +106,12 @@ Strict rule: If compliance_risk == "BLOCKED", reject immediately (non-recoverabl
             reasoning = "Compliance BLOCKED decision - automatic rejection (hard stop)"
             flags = ["HARD_STOP_BLOCKED"]
         else:
-            for content_block in response.content:
-                if hasattr(content_block, 'text'):
-                    reasoning = content_block.text
+            for block in response.content:
+                if block.type == "text":
+                    reasoning = block.text
 
-                elif content_block.type == "tool_use":
-                    tool_name = content_block.name
+                elif block.type == "tool_use":
+                    tool_name = block.name
 
                     if tool_name == "validate_approval_chain":
                         # Check all stages passed

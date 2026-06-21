@@ -6,18 +6,15 @@ Purpose: Create account, schedule advisor meeting, send notifications.
 import json
 import time
 from typing import Dict, Any
-from openai import OpenAI
+from anthropic import Anthropic
 from tools.mocks import create_mock_account, schedule_advisor_meeting
-from tools.schemas import TOOL_SCHEMAS
+from tools.schemas import get_all_tools
 
-client = OpenAI()
+client = Anthropic()
 
 HAIKU_MODEL = "claude-3-5-haiku-20241022"
 
-SETUP_TOOLS = [
-    TOOL_SCHEMAS["create_account"],
-    TOOL_SCHEMAS["schedule_advisor_meeting"],
-]
+# Tools loaded dynamically in run_setup_agent
 
 SETUP_SYSTEM_PROMPT = """You are an Account Setup Agent.
 Your role: Provision accounts, create advisor relationships, schedule follow-ups.
@@ -63,10 +60,14 @@ Tasks:
 """
 
     try:
-        response = client.beta.messages.create(
+        # Get setup tools
+        all_tools = get_all_tools()
+        setup_tools = [t for t in all_tools if t['function']['name'] in ['create_account', 'schedule_advisor_meeting']]
+
+        response = client.messages.create(
             model=HAIKU_MODEL,
             max_tokens=1200,
-            tools=SETUP_TOOLS,
+            tools=setup_tools,
             system=SETUP_SYSTEM_PROMPT,
             messages=[
                 {"role": "user", "content": user_message}
@@ -78,12 +79,12 @@ Tasks:
         meeting_id = None
         reasoning = None
 
-        for content_block in response.content:
-            if hasattr(content_block, 'text'):
-                reasoning = content_block.text
+        for block in response.content:
+            if block.type == "text":
+                reasoning = block.text
 
-            elif content_block.type == "tool_use":
-                tool_name = content_block.name
+            elif block.type == "tool_use":
+                tool_name = block.name
 
                 if tool_name == "create_account":
                     account_data = create_mock_account(client_data)

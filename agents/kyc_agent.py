@@ -6,18 +6,13 @@ Purpose: Validate client identity and ensure all required documents provided.
 import json
 import time
 from typing import Dict, Any
-from openai import OpenAI
+from anthropic import Anthropic
 from tools.mocks import validate_documents, mask_pii, SAMPLE_CLIENTS
-from tools.schemas import TOOL_SCHEMAS
+from tools.schemas import get_all_tools
 
-client = OpenAI()
+client = Anthropic()
 
 HAIKU_MODEL = "claude-3-5-haiku-20241022"
-
-KYC_TOOLS = [
-    TOOL_SCHEMAS["verify_identity"],
-    TOOL_SCHEMAS["validate_required_documents"],
-]
 
 KYC_SYSTEM_PROMPT = """You are a KYC (Know Your Customer) Verification Agent.
 Your role: Validate client identity and ensure all required documents are provided.
@@ -46,32 +41,36 @@ Verify KYC for this client:
 - Documents provided: {', '.join(client_data['documents'])}
 - Required: passport, tax_return
 
-1. Call verify_identity to confirm strong identity
-2. Call validate_required_documents to check completeness
+Based on the tools available:
+1. Use verify_identity to confirm strong identity
+2. Use validate_required_documents to check completeness
 3. Return structured decision: PASS or FAIL with reasoning
 """
 
     try:
-        response = client.beta.messages.create(
+        # Get only KYC-relevant tools
+        all_tools = get_all_tools()
+        kyc_tools = [t for t in all_tools if t['function']['name'] in ['verify_identity', 'validate_required_documents']]
+
+        response = client.messages.create(
             model=HAIKU_MODEL,
             max_tokens=1024,
-            tools=KYC_TOOLS,
+            tools=kyc_tools,
             system=KYC_SYSTEM_PROMPT,
             messages=[
                 {"role": "user", "content": user_message}
             ]
         )
 
-        # Process tool calls
+        # Process response
         decision = None
         reasoning = None
 
-        for content_block in response.content:
-            if hasattr(content_block, 'text'):
-                reasoning = content_block.text
-            elif content_block.type == "tool_use":
-                tool_name = content_block.name
-                tool_input = content_block.input
+        for block in response.content:
+            if block.type == "text":
+                reasoning = block.text
+            elif block.type == "tool_use":
+                tool_name = block.name
 
                 if tool_name == "verify_identity":
                     decision = "PASS"

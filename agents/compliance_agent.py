@@ -6,18 +6,13 @@ Purpose: Assess regulatory compliance risk, check sanctions lists, assign risk c
 import json
 import time
 from typing import Dict, Any
-from openai import OpenAI
+from anthropic import Anthropic
 from tools.mocks import check_sanctions, assess_risk_score, mask_pii
-from tools.schemas import TOOL_SCHEMAS
+from tools.schemas import get_all_tools
 
-client = OpenAI()
+client = Anthropic()
 
 SONNET_MODEL = "claude-3-5-sonnet-20241022"
-
-COMPLIANCE_TOOLS = [
-    TOOL_SCHEMAS["sanctions_check"],
-    TOOL_SCHEMAS["assess_compliance_risk"],
-]
 
 COMPLIANCE_SYSTEM_PROMPT = """You are a Compliance Risk Assessment Agent.
 Your role: Screen clients against sanctions lists and assign compliance risk category.
@@ -57,18 +52,22 @@ Perform compliance assessment for this client:
 - Investment Experience: {client_data['investment_experience']}
 
 Tasks:
-1. Call sanctions_check to screen against OFAC/UN/EU lists
+1. Use sanctions_check to screen against OFAC/UN/EU lists
 2. If sanctions match found → return BLOCKED (non-recoverable)
-3. If no match, call assess_compliance_risk with income/networth/experience
+3. If no match, use assess_compliance_risk with income/networth/experience
 4. Return risk category (LOW/MEDIUM/HIGH/BLOCKED) with reasoning
 5. Include any compliance flags or concerns
 """
 
     try:
-        response = client.beta.messages.create(
+        # Get only compliance-relevant tools
+        all_tools = get_all_tools()
+        compliance_tools = [t for t in all_tools if t['function']['name'] in ['sanctions_check', 'assess_compliance_risk']]
+
+        response = client.messages.create(
             model=SONNET_MODEL,
             max_tokens=1500,
-            tools=COMPLIANCE_TOOLS,
+            tools=compliance_tools,
             system=COMPLIANCE_SYSTEM_PROMPT,
             messages=[
                 {"role": "user", "content": user_message}
@@ -81,13 +80,12 @@ Tasks:
         risk_score = 0
         flags = []
 
-        for content_block in response.content:
-            if hasattr(content_block, 'text'):
-                reasoning = content_block.text
+        for block in response.content:
+            if block.type == "text":
+                reasoning = block.text
 
-            elif content_block.type == "tool_use":
-                tool_name = content_block.name
-                tool_input = content_block.input
+            elif block.type == "tool_use":
+                tool_name = block.name
 
                 if tool_name == "sanctions_check":
                     sanctions_result = check_sanctions(

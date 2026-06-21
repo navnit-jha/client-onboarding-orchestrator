@@ -6,17 +6,15 @@ Purpose: Generate legal documents, contracts, disclosures, consent forms.
 import json
 import time
 from typing import Dict, Any
-from openai import OpenAI
+from anthropic import Anthropic
 from tools.mocks import generate_mock_client_docs, mask_pii
-from tools.schemas import TOOL_SCHEMAS
+from tools.schemas import get_all_tools
 
-client = OpenAI()
+client = Anthropic()
 
 HAIKU_MODEL = "claude-3-5-haiku-20241022"
 
-DOCUMENT_TOOLS = [
-    TOOL_SCHEMAS["generate_onboarding_documents"],
-]
+# Tools loaded dynamically in run_document_agent
 
 DOCUMENT_SYSTEM_PROMPT = """You are a Document Generation Agent.
 Your role: Create onboarding legal documents based on client profile and compliance risk.
@@ -68,10 +66,14 @@ Instructions:
 """
 
     try:
-        response = client.beta.messages.create(
+        # Get document generation tool
+        all_tools = get_all_tools()
+        doc_tools = [t for t in all_tools if t['function']['name'] == 'generate_onboarding_documents']
+
+        response = client.messages.create(
             model=HAIKU_MODEL,
             max_tokens=1200,
-            tools=DOCUMENT_TOOLS,
+            tools=doc_tools,
             system=DOCUMENT_SYSTEM_PROMPT,
             messages=[
                 {"role": "user", "content": user_message}
@@ -82,12 +84,12 @@ Instructions:
         documents = []
         reasoning = None
 
-        for content_block in response.content:
-            if hasattr(content_block, 'text'):
-                reasoning = content_block.text
+        for block in response.content:
+            if block.type == "text":
+                reasoning = block.text
 
-            elif content_block.type == "tool_use":
-                if content_block.name == "generate_onboarding_documents":
+            elif block.type == "tool_use":
+                if block.name == "generate_onboarding_documents":
                     # Generate mock documents based on risk category
                     mock_docs = generate_mock_client_docs(client_data)
                     documents = [

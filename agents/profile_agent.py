@@ -6,17 +6,14 @@ Purpose: Build client investment profile, assess risk tolerance, recommend strat
 import json
 import time
 from typing import Dict, Any
-from openai import OpenAI
-from tools.schemas import TOOL_SCHEMAS
+from anthropic import Anthropic
+from tools.schemas import get_all_tools
 
-client = OpenAI()
+client = Anthropic()
 
 SONNET_MODEL = "claude-3-5-sonnet-20241022"
 
-PROFILE_TOOLS = [
-    TOOL_SCHEMAS["assess_risk_tolerance"],
-    TOOL_SCHEMAS["recommend_investment_strategy"],
-]
+# Tools loaded dynamically in run_profile_agent
 
 PROFILE_SYSTEM_PROMPT = """You are a Financial Profile Agent.
 Your role: Analyze client profile, assess risk tolerance, recommend investment strategy.
@@ -73,10 +70,14 @@ Tasks:
 """
 
     try:
-        response = client.beta.messages.create(
+        # Get profile tools
+        all_tools = get_all_tools()
+        profile_tools = [t for t in all_tools if t['function']['name'] in ['assess_risk_tolerance', 'recommend_investment_strategy']]
+
+        response = client.messages.create(
             model=SONNET_MODEL,
             max_tokens=1500,
-            tools=PROFILE_TOOLS,
+            tools=profile_tools,
             system=PROFILE_SYSTEM_PROMPT,
             messages=[
                 {"role": "user", "content": user_message}
@@ -88,12 +89,12 @@ Tasks:
         reasoning = None
         allocation = {}
 
-        for content_block in response.content:
-            if hasattr(content_block, 'text'):
-                reasoning = content_block.text
+        for block in response.content:
+            if block.type == "text":
+                reasoning = block.text
 
-            elif content_block.type == "tool_use":
-                tool_name = content_block.name
+            elif block.type == "tool_use":
+                tool_name = block.name
 
                 if tool_name == "recommend_investment_strategy":
                     # Determine strategy based on stated risk tolerance
