@@ -1,0 +1,66 @@
+{
+  "client_id": "CLI001",
+  "client_name": "[MASKED]",
+  "final_status": "APPROVED",
+  "timestamp": "2024-06-21T12:45:30.123456",
+  "agents_executed": [
+    {
+      "agent": "kyc_agent",
+      "model": "claude-3-5-haiku-20241022",
+      "result": "PASS",
+      "duration_ms": 245,
+      "documents_checked": ["passport", "tax_return", "proof_of_income"]
+    },
+    {
+      "agent": "compliance_agent",
+      "model": "claude-3-5-sonnet-20241022",
+      "result": "LOW",
+      "risk_score": 5,
+      "flags": [],
+      "duration_ms": 890,
+      "reasoning": "Client: Low net worth, established investor, clean background"
+    },
+    {
+      "agent": "document_agent",
+      "model": "claude-3-5-haiku-20241022",
+      "result": "GENERATED",
+      "documents_count": 2,
+      "documents": [
+        {"document_id": "DOC-45821", "type": "Wealth Management Agreement", "status": "GENERATED", "requires_signature": true},
+        {"document_id": "DOC-45822", "type": "Risk Disclosure Statement", "status": "GENERATED", "requires_signature": true}
+      ],
+      "duration_ms": 120
+    },
+    {
+      "agent": "profile_agent",
+      "model": "claude-3-5-sonnet-20241022",
+      "result": "CONSERVATIVE",
+      "asset_allocation": {"stocks": 40, "bonds": 60, "alternatives": 0},
+      "duration_ms": 650,
+      "reasoning": "Conservative investor, moderate risk tolerance, long-term horizon"
+    },
+    {
+      "agent": "setup_agent",
+      "model": "claude-3-5-haiku-20241022",
+      "result": "READY",
+      "account_id": "ACC-847291",
+      "meeting_id": "MTG-521043",
+      "meeting_date": "2024-07-05",
+      "next_steps": ["Upload government ID", "Set up direct deposit", "Review investment materials", "Attend advisor meeting"],
+      "duration_ms": 180
+    },
+    {
+      "agent": "critic_agent",
+      "model": "claude-3-5-sonnet-20241022",
+      "result": "CONFIRM_APPROVAL",
+      "confidence": 0.98,
+      "chain_summary": {"kyc": "PASS", "compliance": "LOW", "documents": "generated", "profile": "CONSERVATIVE", "setup": "READY"},
+      "flags": [],
+      "inconsistencies": [],
+      "duration_ms": 320,
+      "reasoning": "All stages passed. Approval confirmed."
+    }
+  ],
+  "total_duration_ms": 3085,
+  "decision_reasoning": "All checks passed. Low-risk profile with appropriate conservative strategy."
+}

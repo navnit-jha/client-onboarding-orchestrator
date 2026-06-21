@@ -1,0 +1,46 @@
+{
+  "workflow": "Client Onboarding Orchestrator",
+  "timestamp": "2024-06-21T12:48:00.000000",
+  "clients_processed": 3,
+  "summary": {
+    "approved": 1,
+    "rejected": 1,
+    "requires_review": 1,
+    "errors": 0
+  },
+  "statistics": {
+    "total_duration_ms": 9580,
+    "average_duration_ms": 3193,
+    "approval_rate": 0.333,
+    "rejection_rate": 0.333,
+    "manual_review_rate": 0.333
+  },
+  "risk_distribution": {
+    "LOW": 1,
+    "MEDIUM": 1,
+    "HIGH": 0,
+    "BLOCKED": 1
+  },
+  "clients": [
+    {
+      "client_id": "CLI001",
+      "final_status": "APPROVED",
+      "risk_level": "LOW",
+      "duration_ms": 3085
+    },
+    {
+      "client_id": "CLI002",
+      "final_status": "REJECTED",
+      "risk_level": "BLOCKED",
+      "reason": "Sanctions match detected",
+      "duration_ms": 1130
+    },
+    {
+      "client_id": "CLI003",
+      "final_status": "REQUIRES_MANUAL_REVIEW",
+      "risk_level": "MEDIUM",
+      "reason": "Risk-strategy mismatch detected by Critic",
+      "duration_ms": 3365
+    }
+  ]
+}

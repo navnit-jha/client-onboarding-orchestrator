@@ -1,0 +1,30 @@
+{
+  "client_id": "CLI002",
+  "client_name": "[MASKED]",
+  "final_status": "REJECTED",
+  "timestamp": "2024-06-21T12:46:15.234567",
+  "agents_executed": [
+    {
+      "agent": "kyc_agent",
+      "model": "claude-3-5-haiku-20241022",
+      "result": "PASS",
+      "duration_ms": 210,
+      "documents_checked": ["passport", "tax_return"]
+    },
+    {
+      "agent": "compliance_agent",
+      "model": "claude-3-5-sonnet-20241022",
+      "result": "BLOCKED",
+      "risk_score": 100,
+      "flags": ["SANCTIONS_MATCH"],
+      "duration_ms": 920,
+      "reasoning": "Exact match in sanctions database - automatic block (non-recoverable)"
+    }
+  ],
+  "total_duration_ms": 1130,
+  "decision_reasoning": "Compliance BLOCKED decision - automatic rejection (hard stop)",
+  "failure_stage": "compliance_agent",
+  "escalation_reason": "Manual review by compliance officer required",
+  "artifacts_generated": [],
+  "critical_note": "Client flagged in OFAC sanctions list. Escalate to compliance and legal teams immediately."
+}

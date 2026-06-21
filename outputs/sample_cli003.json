@@ -1,0 +1,84 @@
+{
+  "client_id": "CLI003",
+  "client_name": "[MASKED]",
+  "final_status": "REQUIRES_MANUAL_REVIEW",
+  "timestamp": "2024-06-21T12:47:00.345678",
+  "agents_executed": [
+    {
+      "agent": "kyc_agent",
+      "model": "claude-3-5-haiku-20241022",
+      "result": "PASS",
+      "duration_ms": 235,
+      "documents_checked": ["passport", "bank_statement"]
+    },
+    {
+      "agent": "compliance_agent",
+      "model": "claude-3-5-sonnet-20241022",
+      "result": "MEDIUM",
+      "risk_score": 35,
+      "flags": ["HIGH_NET_WORTH"],
+      "duration_ms": 875,
+      "reasoning": "Client income $5.5M qualifies as ultra-high net worth. Requires enhanced scrutiny."
+    },
+    {
+      "agent": "document_agent",
+      "model": "claude-3-5-haiku-20241022",
+      "result": "GENERATED",
+      "documents_count": 3,
+      "documents": [
+        {"document_id": "DOC-58901", "type": "Wealth Management Agreement", "status": "GENERATED", "requires_signature": true},
+        {"document_id": "DOC-58902", "type": "Risk Disclosure Statement", "status": "GENERATED", "requires_signature": true},
+        {"document_id": "DOC-58903", "type": "AML Certification", "status": "GENERATED", "requires_signature": true}
+      ],
+      "duration_ms": 125
+    },
+    {
+      "agent": "profile_agent",
+      "model": "claude-3-5-sonnet-20241022",
+      "result": "AGGRESSIVE",
+      "asset_allocation": {"stocks": 80, "bonds": 15, "alternatives": 5},
+      "duration_ms": 720,
+      "reasoning": "Aggressive strategy selected based on stated risk tolerance"
+    },
+    {
+      "agent": "setup_agent",
+      "model": "claude-3-5-haiku-20241022",
+      "result": "PENDING",
+      "duration_ms": 0,
+      "reason": "Awaiting critic approval before account setup"
+    },
+    {
+      "agent": "critic_agent",
+      "model": "claude-3-5-sonnet-20241022",
+      "result": "ESCALATE_FOR_REVIEW",
+      "confidence": 0.80,
+      "chain_summary": {"kyc": "PASS", "compliance": "MEDIUM", "documents": "generated", "profile": "AGGRESSIVE", "setup": "PENDING"},
+      "flags": ["RISK_STRATEGY_MISMATCH"],
+      "inconsistencies": [
+        {
+          "type": "risk_strategy_mismatch",
+          "severity": "medium",
+          "detail": "Compliance risk is MEDIUM but strategy is AGGRESSIVE. Recommend review with senior advisor."
+        }
+      ],
+      "duration_ms": 410,
+      "reasoning": "Inconsistency detected between risk (MEDIUM) and strategy (AGGRESSIVE). Manual review recommended."
+    }
+  ],
+  "total_duration_ms": 3365,
+  "decision_reasoning": "Critic detected inconsistency: MEDIUM compliance risk with AGGRESSIVE strategy is misaligned. Recommend senior advisor review before approval.",
+  "inconsistencies": [
+    {
+      "type": "risk_strategy_mismatch",
+      "severity": "medium",
+      "detail": "Compliance risk is MEDIUM but strategy is AGGRESSIVE"
+    }
+  ],
+  "escalation_reason": "Risk-strategy alignment requires senior advisor review",
+  "recommended_action": "Review with senior wealth advisor - possible strategy downgrade to MODERATE or additional risk mitigation needed",
+  "artifacts_generated": [
+    {"document_id": "DOC-58901", "type": "Wealth Management Agreement"},
+    {"document_id": "DOC-58902", "type": "Risk Disclosure Statement"},
+    {"document_id": "DOC-58903", "type": "AML Certification"}
+  ]
+}
